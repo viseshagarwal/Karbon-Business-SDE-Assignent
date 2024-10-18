@@ -3,13 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload Data</title>
+    <title>Home | Karbon SDE Internship - Hackathon</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        margin: auto;
+      }
+
+      input[type="file"] {
+        display: block;
+        margin: 10px 0;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .error {
+        color: red;
+        display: none;
+      }
+    </style>
   </head>
   <body>
-    <h1>Upload Data</h1>
-    <form action="/upload" method="post" enctype="multipart/form-data">
-      <input type="file" name="file" accept=".json" />
+    <h1 style="text-align: center">Karbon SDE Internship - Hackathon</h1>
+    <hr />
+    <br />
+    <h2>Upload Data</h2>
+    <br />
+    <form
+      id="uploadForm"
+      action="/upload"
+      method="post"
+      enctype="multipart/form-data"
+      onsubmit="return validateForm()"
+    >
+      <input type="file" name="file" accept=".json" id="fileInput" />
+      <div class="error" id="errorMessage">
+        Please upload a valid JSON file.
+      </div>
       <button type="submit">Submit</button>
     </form>
+
+    <script>
+      function validateForm() {
+        const fileInput = document.getElementById("fileInput");
+        const errorMessage = document.getElementById("errorMessage");
+
+        // Clear previous error message
+        errorMessage.style.display = "none";
+
+        if (!fileInput.files.length) {
+          errorMessage.textContent = "Please select a file.";
+          errorMessage.style.display = "block";
+          return false;
+        }
+
+        const file = fileInput.files[0];
+        const fileType = file.type;
+
+        // Validate file type (JSON)
+        if (fileType !== "application/json" && !file.name.endsWith(".json")) {
+          errorMessage.style.display = "block";
+          return false;
+        }
+
+        return true; // Valid file
+      }
+    </script>
   </body>
 </html>

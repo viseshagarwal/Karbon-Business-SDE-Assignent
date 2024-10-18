@@ -32,10 +32,9 @@ def latest_financial_index(data: dict):
     Returns:
     - int: The index of the latest standalone financial entry or 0 if not found.
     """
-    for index, financial in enumerate(data.get("financials", [])):
-        if financial.get("nature") == "STANDALONE":
+    for index, financial in enumerate(data["financials"]):
+        if financial["nature"] == "STANDALONE":
             return index
-    logger.warning("No STANDALONE financial data found. Using index 0.")
     return 0
 
 
@@ -55,7 +54,6 @@ def total_revenue(data: dict, financial_index):
     """
     revenue = data["financials"][financial_index]
     net_revenue = revenue["pnl"]["lineItems"]["net_revenue"]
-    print(net_revenue)
     return net_revenue
 
 
@@ -78,7 +76,6 @@ def total_borrowing(data: dict, financial_index):
     total_revenue_local = total_revenue(data, financial_index)
     borrowing_sum = revenue["bs"]["liabilities"]["long_term_borrowings"] + \
         revenue["bs"]["liabilities"]["short_term_borrowings"]
-    print(borrowing_sum/total_revenue_local)
     return borrowing_sum/total_revenue_local
 
 
@@ -99,10 +96,8 @@ def iscr_flag(data: dict, financial_index):
     """
     iscr_value = iscr(data, financial_index)
     if iscr_value >= 2:
-        print(FLAGS.GREEN)
         return FLAGS.GREEN
     else:
-        print(FLAGS.RED)
         return FLAGS.RED
 
 
@@ -123,10 +118,8 @@ def total_revenue_5cr_flag(data: dict, financial_index):
     """
     total_revenue_local = total_revenue(data, financial_index)
     if total_revenue_local >= 50000000:
-        print(FLAGS.GREEN)
         return FLAGS.GREEN
     else:
-        print(FLAGS.RED)
         return FLAGS.RED
 
 
@@ -150,7 +143,6 @@ def iscr(data: dict, financial_index):
         revenue["pnl"]["lineItems"]["depreciation"]+1
     sum_of_interest = revenue["pnl"]["lineItems"]["interest"] + \
         revenue["pnl"]["lineItems"]["total_other_expenses"]+1
-    # print (sum_of_profit/sum_of_interest)
     return sum_of_profit/sum_of_interest
 
 
@@ -173,8 +165,6 @@ def borrowing_to_revenue_flag(data: dict, financial_index):
     total_revenue_local = total_revenue(data, financial_index)
     ratio = total_borrowing_local/total_revenue_local
     if ratio <= 0.25:
-        print(FLAGS.GREEN)
         return FLAGS.GREEN
     else:
-        print(FLAGS.AMBER)
         return FLAGS.AMBER

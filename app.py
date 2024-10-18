@@ -65,7 +65,6 @@ def upload():
         return redirect(request.url)
 
     file = request.files['file']
-
     if file.filename == '':
         return redirect(request.url)
 
