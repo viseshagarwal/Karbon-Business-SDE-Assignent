@@ -53,13 +53,10 @@ def total_revenue(data: dict, financial_index):
     Returns:
     - float: The net revenue value from the financial data.
     """
-    try:
-        revenue = data["financials"][financial_index]["pnl"]["lineItems"]["netRevenue"]
-        logger.info(f"Total revenue: {revenue}")
-        return revenue
-    except (KeyError, IndexError) as e:
-        logger.error(f"Error calculating total revenue: {str(e)}")
-        return 0
+    revenue = data["financials"][financial_index]
+    net_revenue = revenue["pnl"]["lineItems"]["net_revenue"]
+    print(net_revenue)
+    return net_revenue
 
 
 def total_borrowing(data: dict, financial_index):
@@ -77,18 +74,12 @@ def total_borrowing(data: dict, financial_index):
     Returns:
     - float: The ratio of total borrowings to total revenue.
     """
-    try:
-        bs = data["financials"][financial_index]["bs"]
-        total_borrowings = bs["lineItems"]["longTermBorrowings"] + \
-            bs["lineItems"]["shortTermBorrowings"]
-        revenue = total_revenue(data, financial_index)
-        borrowing_to_revenue_ratio = total_borrowings / revenue if revenue != 0 else 0
-        logger.info(f"Borrowing to revenue ratio: {
-                    borrowing_to_revenue_ratio}")
-        return borrowing_to_revenue_ratio
-    except (KeyError, ZeroDivisionError) as e:
-        logger.error(f"Error calculating borrowing to revenue ratio: {str(e)}")
-        return 0
+    revenue = data["financials"][financial_index]
+    total_revenue_local = total_revenue(data, financial_index)
+    borrowing_sum = revenue["bs"]["liabilities"]["long_term_borrowings"] + \
+        revenue["bs"]["liabilities"]["short_term_borrowings"]
+    print(borrowing_sum/total_revenue_local)
+    return borrowing_sum/total_revenue_local
 
 
 def iscr_flag(data: dict, financial_index):
@@ -107,7 +98,12 @@ def iscr_flag(data: dict, financial_index):
     - FLAGS.GREEN or FLAGS.RED: The flag color based on the ISCR value.
     """
     iscr_value = iscr(data, financial_index)
-    return FLAGS.GREEN if iscr_value >= 2 else FLAGS.RED
+    if iscr_value >= 2:
+        print(FLAGS.GREEN)
+        return FLAGS.GREEN
+    else:
+        print(FLAGS.RED)
+        return FLAGS.RED
 
 
 def total_revenue_5cr_flag(data: dict, financial_index):
@@ -125,8 +121,13 @@ def total_revenue_5cr_flag(data: dict, financial_index):
     Returns:
     - FLAGS.GREEN or FLAGS.RED: The flag color based on the total revenue.
     """
-    revenue = total_revenue(data, financial_index)
-    return FLAGS.GREEN if revenue >= 50_000_000 else FLAGS.RED
+    total_revenue_local = total_revenue(data, financial_index)
+    if total_revenue_local >= 50000000:
+        print(FLAGS.GREEN)
+        return FLAGS.GREEN
+    else:
+        print(FLAGS.RED)
+        return FLAGS.RED
 
 
 def iscr(data: dict, financial_index):
@@ -144,17 +145,13 @@ def iscr(data: dict, financial_index):
     Returns:
     - float: The ISCR value.
     """
-    try:
-        pnl = data["financials"][financial_index]["pnl"]
-        profit_before_interest_tax_depreciation = pnl["lineItems"]["profitBeforeInterestTaxDepreciation"]
-        interest_expenses = pnl["lineItems"]["interestExpenses"]
-        iscr_value = (profit_before_interest_tax_depreciation +
-                      1) / (interest_expenses + 1)
-        logger.info(f"ISCR value: {iscr_value}")
-        return iscr_value
-    except (KeyError, ZeroDivisionError) as e:
-        logger.error(f"Error calculating ISCR: {str(e)}")
-        return 0
+    revenue = data["financials"][financial_index]
+    sum_of_profit = revenue["pnl"]["lineItems"]["profit_before_interest_and_tax"] + \
+        revenue["pnl"]["lineItems"]["depreciation"]+1
+    sum_of_interest = revenue["pnl"]["lineItems"]["interest"] + \
+        revenue["pnl"]["lineItems"]["total_other_expenses"]+1
+    # print (sum_of_profit/sum_of_interest)
+    return sum_of_profit/sum_of_interest
 
 
 def borrowing_to_revenue_flag(data: dict, financial_index):
@@ -172,5 +169,12 @@ def borrowing_to_revenue_flag(data: dict, financial_index):
     Returns:
     - FLAGS.GREEN or FLAGS.AMBER: The flag color based on the borrowing to revenue ratio.
     """
-    borrowing_to_revenue_ratio = total_borrowing(data, financial_index)
-    return FLAGS.GREEN if borrowing_to_revenue_ratio <= 0.25 else FLAGS.AMBER
+    total_borrowing_local = total_borrowing(data, financial_index)
+    total_revenue_local = total_revenue(data, financial_index)
+    ratio = total_borrowing_local/total_revenue_local
+    if ratio <= 0.25:
+        print(FLAGS.GREEN)
+        return FLAGS.GREEN
+    else:
+        print(FLAGS.AMBER)
+        return FLAGS.AMBER
