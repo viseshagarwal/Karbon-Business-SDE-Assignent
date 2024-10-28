@@ -26,7 +26,7 @@ This is a simple Flask application that allows users to upload financial data in
    cd your-repository-name
    ```
 
-````
+
 
 2. Set up a virtual environment:
 
@@ -52,7 +52,6 @@ This is a simple Flask application that allows users to upload financial data in
 2. Open your browser and go to `http://localhost:5000`.
 
 3. Upload a JSON file to see the financial flags.
-````
 
 ## Deployed App: https://karbon-business-sde-assignent.vercel.app/
 
