@@ -37,4 +37,4 @@ if __name__ == "__main__":
         content = file.read()
         # convert to json
         data = json.loads(content)
-        print(probe_model_5l_profit(data["data"]))
+        # print(probe_model_5l_profit(data["data"]))
